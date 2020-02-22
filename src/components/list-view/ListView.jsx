@@ -1,7 +1,8 @@
 import React, { Fragment, useState, useEffect, useCallback } from "react";
-import { Link } from 'react-router-dom';
+import { Link } from "react-router-dom";
 import Table from "../Table";
 
+// Debounce function
 function debounce(func, wait) {
   let timeout;
   return function(...args) {
@@ -10,22 +11,19 @@ function debounce(func, wait) {
     timeout = setTimeout(() => {
       timeout = null;
       func.apply(context, args);
-    }, wait)
-    }
-  }
-
+    }, wait);
+  };
+}
 
 const ListView = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState([]);
-  
 
-      
-
+  // Get list items from api
   const getListItems = async () => {
     setIsLoading(true);
     try {
-      let response = await fetch('http://localhost:3000/characters?+&_limit=10');
+      let response = await fetch("http://localhost:3000/characters");
       const finalResponse = await response.json();
       setData(finalResponse);
       setIsLoading(false);
@@ -35,43 +33,40 @@ const ListView = () => {
     }
   };
 
-  // const getNextTen = async () => {
-  //   setIsLoading(true);
-  //   try {
-  //     let response = await fetch('http://localhost:3000/characters?+&_limit=10');
-  //     const finalResponse = await response.json();
-  //     setListItems(finalResponse);
-  //     setIsLoading(false);
-  //   } catch (err) {
-  //     console.log(err);
-  //     alert("Something went wrong! Try again");
-  //   }
-  // }
-
+  //Get list items on first render
   useEffect(() => {
     getListItems();
   }, []);
 
-  const onChange = value => {
-    fetch(`http://localhost:3000/characters?q=${value}`).then(res =>res.json()).then(res => setData(res))
-   }
-
-   const debounceOnChange = useCallback(debounce(onChange, 200), []);
+  // Search request from API
+  const onChange = async value => {
+    await fetch(`http://localhost:3000/characters?q=${value}`)
+      .then(res => res.json())
+      .then(res => setData(res));
+  };
+  // Debounce search request
+  const debounceOnChange = useCallback(debounce(onChange, 200), []);
 
   // let filteredData = !search
   // ? listItems
   // : listItems.filter(data => data.name.toLowerCase().includes(search.toLowerCase()))
 
-  
   const handleEdit = id => {
     alert("I want to edit");
   };
 
-  const handleDelete = id => {
-    alert("I want to delete");
+  // Delete list item
+  const handleDelete = async id => {
+    try {
+      await fetch(`http://localhost:3000/characters/${id}`, {
+        method: "DELETE"
+      }).then(res => res.json());
+      alert("Character Deleted Successfully");
+      getListItems();
+    } catch (error) {
+      console.log(error);
+    }
   };
-
- 
 
   return (
     <Fragment>
@@ -79,7 +74,7 @@ const ListView = () => {
 
       <div className="row">
         <div className="col-sm-6">
-        <div className="form-group">
+          <div className="form-group">
             <label htmlFor="searchInput" className="sr-only">
               Search
             </label>
@@ -93,13 +88,21 @@ const ListView = () => {
           </div>
         </div>
         <div className="col-sm-6 text-sm-right">
-          <Link to='/add-character' type="button" className="btn btn-primary mb-3">
+          <Link
+            to="/add-character"
+            type="button"
+            className="btn btn-primary mb-3">
             Add New
           </Link>
         </div>
       </div>
 
-     <Table filteredData={data} isLoading={isLoading} handleDelete={handleDelete} handleEdit={handleEdit} />
+      <Table
+        filteredData={data}
+        isLoading={isLoading}
+        handleDelete={handleDelete}
+        handleEdit={handleEdit}
+      />
 
       <nav aria-label="Data grid navigation">
         <ul className="pagination justify-content-end">
