@@ -4,6 +4,7 @@ const AddCharacter = props => {
   const [data, setData] = useState([]);
   const [inputs, setInputs] = useState([]);
 
+  // Get list items from API
   const getListItems = async () => {
     try {
       let response = await fetch(
@@ -21,6 +22,7 @@ const AddCharacter = props => {
     getListItems();
   }, []);
 
+  // Manage inputs of the form
   const handleInputChange = event => {
     event.persist();
     setInputs(inputs => ({
@@ -30,6 +32,7 @@ const AddCharacter = props => {
     console.log(inputs);
   };
 
+  // Handles form submission
   const handleSubmit = async e => {
     e.preventDefault();
     try {
@@ -60,7 +63,7 @@ const AddCharacter = props => {
                 </label>
                 <input
                   type="text"
-                  className="form-control is-valid"
+                  className="form-control"
                   id="validationServer01"
                   name="name"
                   placeholder="Name"
@@ -68,7 +71,7 @@ const AddCharacter = props => {
                   onChange={handleInputChange}
                   required
                 />
-                <div className="valid-feedback">Looks good!</div>
+                {/* <div className="valid-feedback">Looks good!</div> */}
               </div>
             </div>
             <div className="form-row">

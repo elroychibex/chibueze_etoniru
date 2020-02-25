@@ -1,6 +1,7 @@
 import React, { Fragment, useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import Table from "../Table";
+import Pagination from "../Pagination";
 
 // Debounce function
 function debounce(func, wait) {
@@ -18,12 +19,16 @@ function debounce(func, wait) {
 const ListView = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState([]);
+  // const [currentPage, setCurrentPage] = useState(1);
+  // const [pageLimit, setPageLimit] = useState(10);
 
   // Get list items from api
-  const getListItems = async () => {
+  const getListItems = async currentPage => {
     setIsLoading(true);
     try {
-      let response = await fetch("http://localhost:3000/characters");
+      let response = await fetch(
+        "http://localhost:3000/characters?_page1=&_limit=10"
+      );
       const finalResponse = await response.json();
       setData(finalResponse);
       setIsLoading(false);
@@ -38,18 +43,22 @@ const ListView = () => {
     getListItems();
   }, []);
 
+  // const nextPage = async () => {
+  //   setCurrentPage(currentPage + 1);
+  //   console.log(currentPage);
+  //   getListItems(currentPage);
+  // };
+
   // Search request from API
   const onChange = async value => {
+    setIsLoading(true);
     await fetch(`http://localhost:3000/characters?q=${value}`)
       .then(res => res.json())
       .then(res => setData(res));
+    setIsLoading(false);
   };
   // Debounce search request
   const debounceOnChange = useCallback(debounce(onChange, 200), []);
-
-  // let filteredData = !search
-  // ? listItems
-  // : listItems.filter(data => data.name.toLowerCase().includes(search.toLowerCase()))
 
   const handleEdit = id => {
     alert("I want to edit");
@@ -62,7 +71,7 @@ const ListView = () => {
         method: "DELETE"
       }).then(res => res.json());
       alert("Character Deleted Successfully");
-      getListItems();
+      window.location.reload();
     } catch (error) {
       console.log(error);
     }
@@ -104,30 +113,7 @@ const ListView = () => {
         handleEdit={handleEdit}
       />
 
-      <nav aria-label="Data grid navigation">
-        <ul className="pagination justify-content-end">
-          <li className="page-item disabled">
-            <button type="button" className="page-link" tabIndex="-1">
-              Previous
-            </button>
-          </li>
-          <li className="page-item active">
-            <button type="button" className="page-link">
-              1 <span className="sr-only">(current)</span>
-            </button>
-          </li>
-          <li className="page-item">
-            <button type="button" className="page-link">
-              2
-            </button>
-          </li>
-          <li className="page-item">
-            <button type="button" className="page-link">
-              Next
-            </button>
-          </li>
-        </ul>
-      </nav>
+      <Pagination />
     </Fragment>
   );
 };

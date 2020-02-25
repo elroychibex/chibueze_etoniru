@@ -164,6 +164,13 @@
       "species": "Droid",
       "gender": "n/a",
       "homeworld": ""
+    },
+    {
+      "species": "Anakin Skywalker",
+      "gender": "n/a",
+      "homeworld": "Test",
+      "name": "Etoniru Chibueze",
+      "id": 20
     }
   ]
 }
